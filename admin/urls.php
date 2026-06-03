@@ -160,9 +160,10 @@ ob_start();
 
 <div class="modal fade" id="urlModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST" action="urls.php?action=<?= $action ?>">
-                <input type="hidden" name="id" id="urlId">
+    <div class="modal-content">
+        <form method="POST" action="urls.php" id="urlForm">
+            <input type="hidden" name="action" id="formAction" value="add">
+            <input type="hidden" name="id" id="urlId">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">添加网址</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -214,11 +215,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlModal = new bootstrap.Modal(document.getElementById('urlModal'));
     const modalTitle = document.getElementById('modalTitle');
     const urlId = document.getElementById('urlId');
+    const formAction = document.getElementById('formAction');
 
     // 桌面端编辑按钮
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             modalTitle.textContent = '修改网址';
+            formAction.value = 'edit';
             urlId.value = this.dataset.id;
             document.getElementById('urlName').value = this.dataset.name;
             document.getElementById('urlUrl').value = this.dataset.url;
@@ -234,6 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.edit-btn-mobile').forEach(btn => {
         btn.addEventListener('click', function() {
             modalTitle.textContent = '修改网址';
+            formAction.value = 'edit';
             urlId.value = this.dataset.id;
             document.getElementById('urlName').value = this.dataset.name;
             document.getElementById('urlUrl').value = this.dataset.url;

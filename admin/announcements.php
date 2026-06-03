@@ -157,10 +157,10 @@ ob_start();
 
 <div class="modal fade" id="announcementModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST" action="announcements.php?action=edit">
-                <input type="hidden" name="id" id="announcementId">
-                <input type="hidden" name="action" id="formAction" value="edit">
+    <div class="modal-content">
+        <form method="POST" action="announcements.php" id="announcementForm">
+            <input type="hidden" name="action" id="formAction" value="add">
+            <input type="hidden" name="id" id="announcementId">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">添加公告</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -209,10 +209,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
     const modalTitle = document.getElementById('modalTitle');
     const announcementId = document.getElementById('announcementId');
+    const formAction = document.getElementById('formAction');
 
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             modalTitle.textContent = '修改公告';
+            formAction.value = 'edit';
             announcementId.value = this.dataset.id;
             document.getElementById('announcementType').value = this.dataset.type;
             document.getElementById('announcementIcon').value = this.dataset.icon;
@@ -227,6 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.edit-btn-mobile').forEach(btn => {
         btn.addEventListener('click', function() {
             modalTitle.textContent = '修改公告';
+            formAction.value = 'edit';
             announcementId.value = this.dataset.id;
             document.getElementById('announcementType').value = this.dataset.type;
             document.getElementById('announcementIcon').value = this.dataset.icon;
