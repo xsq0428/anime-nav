@@ -63,59 +63,104 @@ ob_start();
 
 <div class="card">
     <div class="card-body">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>排序</th>
-                    <th>类型</th>
-                    <th>图标</th>
-                    <th>内容</th>
-                    <th>状态</th>
-                    <th width="150">操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $stmt = $pdo->query("SELECT * FROM announcements ORDER BY sort_order");
-                while ($row = $stmt->fetch()):
-                ?>
-                <tr>
-                    <td><?= $row['sort_order'] ?></td>
-                    <td>
+        <!-- 桌面端表格 -->
+        <div class="table-responsive d-none d-md-block">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>排序</th>
+                        <th>类型</th>
+                        <th>图标</th>
+                        <th>内容</th>
+                        <th>状态</th>
+                        <th width="150">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $stmt = $pdo->query("SELECT * FROM announcements ORDER BY sort_order");
+                    while ($row = $stmt->fetch()):
+                    ?>
+                    <tr>
+                        <td><?= $row['sort_order'] ?></td>
+                        <td>
+                            <?php
+                            $types = ['bookmark' => '收藏提示', 'contact' => '联系信息', 'notice' => '公告'];
+                            echo $types[$row['type']] ?? $row['type'];
+                            ?>
+                        </td>
+                        <td><?= sanitize($row['icon']) ?></td>
+                        <td><?= sanitize($row['content']) ?></td>
+                        <td><span class="badge bg-<?= $row['is_active'] ? 'success' : 'secondary' ?>"><?= $row['is_active'] ? '启用' : '禁用' ?></span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary edit-btn" 
+                                data-id="<?= $row['id'] ?>"
+                                data-type="<?= $row['type'] ?>"
+                                data-icon="<?= htmlspecialchars($row['icon']) ?>"
+                                data-content="<?= htmlspecialchars($row['content'], ENT_QUOTES) ?>"
+                                data-sort="<?= $row['sort_order'] ?>"
+                                data-active="<?= $row['is_active'] ?>">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement(<?= $row['id'] ?>)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 移动端卡片列表 -->
+        <div class="d-md-none">
+            <?php
+            $stmt = $pdo->query("SELECT * FROM announcements ORDER BY sort_order");
+            while ($row = $stmt->fetch()):
+            ?>
+            <div class="card mb-3 border shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><?= sanitize($row['icon']) ?> <?= sanitize($row['content']) ?></h6>
+                        <span class="badge bg-<?= $row['is_active'] ? 'success' : 'secondary' ?>"><?= $row['is_active'] ? '启用' : '禁用' ?></span>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">类型:</small>
                         <?php
                         $types = ['bookmark' => '收藏提示', 'contact' => '联系信息', 'notice' => '公告'];
-                        echo $types[$row['type']] ?? $row['type'];
                         ?>
-                    </td>
-                    <td><?= sanitize($row['icon']) ?></td>
-                    <td><?= sanitize($row['content']) ?></td>
-                    <td><span class="badge bg-<?= $row['is_active'] ? 'success' : 'secondary' ?>"><?= $row['is_active'] ? '启用' : '禁用' ?></span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary edit-btn" 
-                            data-id="<?= $row['id'] ?>"
-                            data-type="<?= $row['type'] ?>"
-                            data-icon="<?= sanitize($row['icon']) ?>"
-                            data-content="<?= sanitize($row['content']) ?>"
-                            data-sort="<?= $row['sort_order'] ?>"
-                            data-active="<?= $row['is_active'] ?>">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement(<?= $row['id'] ?>)">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
+                        <span class="badge bg-info"><?= $types[$row['type']] ?? $row['type'] ?></span>
+                    </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">排序：<?= $row['sort_order'] ?></small>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary edit-btn-mobile" 
+                                data-id="<?= $row['id'] ?>"
+                                data-type="<?= $row['type'] ?>"
+                                data-icon="<?= htmlspecialchars($row['icon']) ?>"
+                                data-content="<?= htmlspecialchars($row['content'], ENT_QUOTES) ?>"
+                                data-sort="<?= $row['sort_order'] ?>"
+                                data-active="<?= $row['is_active'] ?>">
+                                <i class="bi bi-pencil"></i> 编辑
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement(<?= $row['id'] ?>)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endwhile; ?>
+        </div>
     </div>
 </div>
 
 <div class="modal fade" id="announcementModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="announcements.php?action=<?= $action ?>">
+            <form method="POST" action="announcements.php?action=edit">
                 <input type="hidden" name="id" id="announcementId">
+                <input type="hidden" name="action" id="formAction" value="edit">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">添加公告</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -160,20 +205,36 @@ ob_start();
 </form>
 
 <script>
-const announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
-const modalTitle = document.getElementById('modalTitle');
-const announcementId = document.getElementById('announcementId');
+document.addEventListener('DOMContentLoaded', function() {
+    const announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+    const modalTitle = document.getElementById('modalTitle');
+    const announcementId = document.getElementById('announcementId');
 
-document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        modalTitle.textContent = '修改公告';
-        announcementId.value = this.dataset.id;
-        document.getElementById('announcementType').value = this.dataset.type;
-        document.getElementById('announcementIcon').value = this.dataset.icon;
-        document.getElementById('announcementContent').value = this.dataset.content;
-        document.getElementById('announcementSort').value = this.dataset.sort;
-        document.getElementById('announcementActive').checked = this.dataset.active == 1;
-        announcementModal.show();
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            modalTitle.textContent = '修改公告';
+            announcementId.value = this.dataset.id;
+            document.getElementById('announcementType').value = this.dataset.type;
+            document.getElementById('announcementIcon').value = this.dataset.icon;
+            document.getElementById('announcementContent').value = this.dataset.content;
+            document.getElementById('announcementSort').value = this.dataset.sort;
+            document.getElementById('announcementActive').checked = this.dataset.active == 1;
+            announcementModal.show();
+        });
+    });
+
+    // 移动端编辑按钮
+    document.querySelectorAll('.edit-btn-mobile').forEach(btn => {
+        btn.addEventListener('click', function() {
+            modalTitle.textContent = '修改公告';
+            announcementId.value = this.dataset.id;
+            document.getElementById('announcementType').value = this.dataset.type;
+            document.getElementById('announcementIcon').value = this.dataset.icon;
+            document.getElementById('announcementContent').value = this.dataset.content;
+            document.getElementById('announcementSort').value = this.dataset.sort;
+            document.getElementById('announcementActive').checked = this.dataset.active == 1;
+            announcementModal.show();
+        });
     });
 });
 

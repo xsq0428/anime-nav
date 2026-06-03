@@ -94,10 +94,10 @@ ob_start();
                         <td>
                             <button class="btn btn-sm btn-outline-primary edit-btn" 
                                 data-id="<?= $row['id'] ?>"
-                                data-title="<?= sanitize($row['title']) ?>"
-                                data-content="<?= sanitize($row['content']) ?>"
-                                data-link="<?= sanitize($row['link_url'] ?? '') ?>"
-                                data-copy="<?= sanitize($row['copy_text'] ?? '') ?>"
+                                data-title="<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>"
+                                data-content="<?= htmlspecialchars($row['content'], ENT_QUOTES) ?>"
+                                data-link="<?= htmlspecialchars($row['link_url'] ?? '', ENT_QUOTES) ?>"
+                                data-copy="<?= htmlspecialchars($row['copy_text'] ?? '', ENT_QUOTES) ?>"
                                 data-sort="<?= $row['sort_order'] ?>"
                                 data-active="<?= $row['is_active'] ?>">
                                 <i class="bi bi-pencil"></i>
@@ -141,10 +141,10 @@ ob_start();
                         <div>
                             <button class="btn btn-sm btn-outline-primary edit-btn-mobile" 
                                 data-id="<?= $row['id'] ?>"
-                                data-title="<?= sanitize($row['title']) ?>"
-                                data-content="<?= sanitize($row['content']) ?>"
-                                data-link="<?= sanitize($row['link_url'] ?? '') ?>"
-                                data-copy="<?= sanitize($row['copy_text'] ?? '') ?>"
+                                data-title="<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>"
+                                data-content="<?= htmlspecialchars($row['content'], ENT_QUOTES) ?>"
+                                data-link="<?= htmlspecialchars($row['link_url'] ?? '', ENT_QUOTES) ?>"
+                                data-copy="<?= htmlspecialchars($row['copy_text'] ?? '', ENT_QUOTES) ?>"
                                 data-sort="<?= $row['sort_order'] ?>"
                                 data-active="<?= $row['is_active'] ?>">
                                 <i class="bi bi-pencil"></i> 编辑
@@ -210,37 +210,39 @@ ob_start();
 </form>
 
 <script>
-const adModal = new bootstrap.Modal(document.getElementById('adModal'));
-const modalTitle = document.getElementById('modalTitle');
-const adId = document.getElementById('adId');
+document.addEventListener('DOMContentLoaded', function() {
+    const adModal = new bootstrap.Modal(document.getElementById('adModal'));
+    const modalTitle = document.getElementById('modalTitle');
+    const adId = document.getElementById('adId');
 
-// 桌面端编辑按钮
-document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        modalTitle.textContent = '修改广告';
-        adId.value = this.dataset.id;
-        document.getElementById('adTitle').value = this.dataset.title;
-        document.getElementById('adContent').value = this.dataset.content;
-        document.getElementById('adLink').value = this.dataset.link;
-        document.getElementById('adCopy').value = this.dataset.copy;
-        document.getElementById('adSort').value = this.dataset.sort;
-        document.getElementById('adActive').checked = this.dataset.active == 1;
-        adModal.show();
+    // 桌面端编辑按钮
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            modalTitle.textContent = '修改广告';
+            adId.value = this.dataset.id;
+            document.getElementById('adTitle').value = this.dataset.title;
+            document.getElementById('adContent').value = this.dataset.content;
+            document.getElementById('adLink').value = this.dataset.link;
+            document.getElementById('adCopy').value = this.dataset.copy;
+            document.getElementById('adSort').value = this.dataset.sort;
+            document.getElementById('adActive').checked = this.dataset.active == 1;
+            adModal.show();
+        });
     });
-});
 
-// 移动端编辑按钮
-document.querySelectorAll('.edit-btn-mobile').forEach(btn => {
-    btn.addEventListener('click', function() {
-        modalTitle.textContent = '修改广告';
-        adId.value = this.dataset.id;
-        document.getElementById('adTitle').value = this.dataset.title;
-        document.getElementById('adContent').value = this.dataset.content;
-        document.getElementById('adLink').value = this.dataset.link;
-        document.getElementById('adCopy').value = this.dataset.copy;
-        document.getElementById('adSort').value = this.dataset.sort;
-        document.getElementById('adActive').checked = this.dataset.active == 1;
-        adModal.show();
+    // 移动端编辑按钮
+    document.querySelectorAll('.edit-btn-mobile').forEach(btn => {
+        btn.addEventListener('click', function() {
+            modalTitle.textContent = '修改广告';
+            adId.value = this.dataset.id;
+            document.getElementById('adTitle').value = this.dataset.title;
+            document.getElementById('adContent').value = this.dataset.content;
+            document.getElementById('adLink').value = this.dataset.link;
+            document.getElementById('adCopy').value = this.dataset.copy;
+            document.getElementById('adSort').value = this.dataset.sort;
+            document.getElementById('adActive').checked = this.dataset.active == 1;
+            adModal.show();
+        });
     });
 });
 

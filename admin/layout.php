@@ -9,33 +9,8 @@
     <style>
         :root {
             --sidebar-width: 280px;
-            <?php
-            // 获取主题颜色配置
-            require_once '../config/database.php';
-            try {
-                $pdo = getDbConnection();
-                $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'theme_color'");
-                $stmt->execute();
-                $themeColor = $stmt->fetchColumn() ?: 'purple';
-                
-                $themeColors = [
-                    'purple' => ['#667eea', '#764ba2'],
-                    'blue' => ['#1e3c72', '#2a5298'],
-                    'green' => ['#11998e', '#38ef7d'],
-                    'orange' => ['#f093fb', '#f5576c'],
-                    'pink' => ['#ff758c', '#ff7eb3'],
-                    'dark' => ['#232526', '#414345'],
-                    'cyan' => ['#06beb6', '#48b1bf'],
-                    'sunset' => ['#ff512f', '#dd2476']
-                ];
-                
-                $colors = $themeColors[$themeColor] ?? $themeColors['purple'];
-                echo "--theme-primary: {$colors[0]};\n";
-                echo "--theme-secondary: {$colors[1]};";
-            } catch (PDOException $e) {
-                echo "--theme-primary: #667eea;\n--theme-secondary: #764ba2;";
-            }
-            ?>
+            --theme-primary: #667eea;
+            --theme-secondary: #764ba2;
         }
         
         * {
@@ -539,10 +514,6 @@
                 <span>公告管理</span>
             </a>
             <div class="sidebar-divider"></div>
-            <a href="theme.php" class="<?= basename($_SERVER['PHP_SELF']) == 'theme.php' ? 'active' : '' ?>">
-                <i class="bi bi-palette"></i>
-                <span>主题配色</span>
-            </a>
             <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
                 <i class="bi bi-gear"></i>
                 <span>系统设置</span>

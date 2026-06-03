@@ -96,10 +96,10 @@ ob_start();
                         <td>
                             <button class="btn btn-sm btn-outline-primary edit-btn" 
                                 data-id="<?= $row['id'] ?>"
-                                data-name="<?= sanitize($row['name']) ?>"
-                                data-url="<?= sanitize($row['url']) ?>"
+                                data-name="<?= htmlspecialchars($row['name'], ENT_QUOTES) ?>"
+                                data-url="<?= htmlspecialchars($row['url'], ENT_QUOTES) ?>"
                                 data-type="<?= $row['type'] ?>"
-                                data-icon="<?= sanitize($row['icon']) ?>"
+                                data-icon="<?= htmlspecialchars($row['icon'], ENT_QUOTES) ?>"
                                 data-sort="<?= $row['sort_order'] ?>"
                                 data-active="<?= $row['is_active'] ?>">
                                 <i class="bi bi-pencil"></i>
@@ -138,10 +138,10 @@ ob_start();
                         <div>
                             <button class="btn btn-sm btn-outline-primary edit-btn-mobile" 
                                 data-id="<?= $row['id'] ?>"
-                                data-name="<?= sanitize($row['name']) ?>"
-                                data-url="<?= sanitize($row['url']) ?>"
+                                data-name="<?= htmlspecialchars($row['name'], ENT_QUOTES) ?>"
+                                data-url="<?= htmlspecialchars($row['url'], ENT_QUOTES) ?>"
                                 data-type="<?= $row['type'] ?>"
-                                data-icon="<?= sanitize($row['icon']) ?>"
+                                data-icon="<?= htmlspecialchars($row['icon'], ENT_QUOTES) ?>"
                                 data-sort="<?= $row['sort_order'] ?>"
                                 data-active="<?= $row['is_active'] ?>">
                                 <i class="bi bi-pencil"></i> 编辑
@@ -210,37 +210,39 @@ ob_start();
 </form>
 
 <script>
-const urlModal = new bootstrap.Modal(document.getElementById('urlModal'));
-const modalTitle = document.getElementById('modalTitle');
-const urlId = document.getElementById('urlId');
+document.addEventListener('DOMContentLoaded', function() {
+    const urlModal = new bootstrap.Modal(document.getElementById('urlModal'));
+    const modalTitle = document.getElementById('modalTitle');
+    const urlId = document.getElementById('urlId');
 
-// 桌面端编辑按钮
-document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        modalTitle.textContent = '修改网址';
-        urlId.value = this.dataset.id;
-        document.getElementById('urlName').value = this.dataset.name;
-        document.getElementById('urlUrl').value = this.dataset.url;
-        document.getElementById('urlType').value = this.dataset.type;
-        document.getElementById('urlIcon').value = this.dataset.icon;
-        document.getElementById('urlSort').value = this.dataset.sort;
-        document.getElementById('urlActive').checked = this.dataset.active == 1;
-        urlModal.show();
+    // 桌面端编辑按钮
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            modalTitle.textContent = '修改网址';
+            urlId.value = this.dataset.id;
+            document.getElementById('urlName').value = this.dataset.name;
+            document.getElementById('urlUrl').value = this.dataset.url;
+            document.getElementById('urlType').value = this.dataset.type;
+            document.getElementById('urlIcon').value = this.dataset.icon;
+            document.getElementById('urlSort').value = this.dataset.sort;
+            document.getElementById('urlActive').checked = this.dataset.active == 1;
+            urlModal.show();
+        });
     });
-});
 
-// 移动端编辑按钮
-document.querySelectorAll('.edit-btn-mobile').forEach(btn => {
-    btn.addEventListener('click', function() {
-        modalTitle.textContent = '修改网址';
-        urlId.value = this.dataset.id;
-        document.getElementById('urlName').value = this.dataset.name;
-        document.getElementById('urlUrl').value = this.dataset.url;
-        document.getElementById('urlType').value = this.dataset.type;
-        document.getElementById('urlIcon').value = this.dataset.icon;
-        document.getElementById('urlSort').value = this.dataset.sort;
-        document.getElementById('urlActive').checked = this.dataset.active == 1;
-        urlModal.show();
+    // 移动端编辑按钮
+    document.querySelectorAll('.edit-btn-mobile').forEach(btn => {
+        btn.addEventListener('click', function() {
+            modalTitle.textContent = '修改网址';
+            urlId.value = this.dataset.id;
+            document.getElementById('urlName').value = this.dataset.name;
+            document.getElementById('urlUrl').value = this.dataset.url;
+            document.getElementById('urlType').value = this.dataset.type;
+            document.getElementById('urlIcon').value = this.dataset.icon;
+            document.getElementById('urlSort').value = this.dataset.sort;
+            document.getElementById('urlActive').checked = this.dataset.active == 1;
+            urlModal.show();
+        });
     });
 });
 
