@@ -22,20 +22,22 @@ ob_start();
 ?>
 <h2 class="mb-4"><i class="bi bi-gear"></i> 系统设置</h2>
 
+<?php
+// 先查询所有 settings
+$stmt = $pdo->query("SELECT * FROM settings ORDER BY FIELD(setting_key, 'site_title', 'site_subtitle', 'site_logo', 'frontend_style')");
+$settings = [];
+while ($row = $stmt->fetch()) {
+    $settings[$row['setting_key']] = $row;
+}
+?>
+
 <form method="POST" action="">
+    
     <div class="card mb-4">
         <div class="card-header">
             <i class="bi bi-house"></i> 站点基本信息
         </div>
         <div class="card-body">
-            <?php
-            $stmt = $pdo->query("SELECT * FROM settings ORDER BY FIELD(setting_key, 'site_title', 'site_subtitle', 'site_logo')");
-            $settings = [];
-            while ($row = $stmt->fetch()) {
-                $settings[$row['setting_key']] = $row;
-            }
-            ?>
-            
             <div class="mb-3">
                 <label class="form-label">网站标题</label>
                 <input type="text" class="form-control" name="settings[site_title]" 

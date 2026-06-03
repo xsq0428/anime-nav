@@ -513,6 +513,10 @@
                 <i class="bi bi-bell"></i>
                 <span>公告管理</span>
             </a>
+            <a href="style.php" class="<?= basename($_SERVER['PHP_SELF']) == 'style.php' ? 'active' : '' ?>">
+                <i class="bi bi-palette"></i>
+                <span>前端风格</span>
+            </a>
             <div class="sidebar-divider"></div>
             <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
                 <i class="bi bi-gear"></i>
