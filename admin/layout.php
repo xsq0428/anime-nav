@@ -135,6 +135,22 @@
             margin: 15px 25px;
         }
         
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .page-header p {
+            font-size: 13px;
+            color: #6c757d;
+        }
+        
         .logout-btn {
             color: rgba(255,255,255,0.85);
             text-decoration: none;
@@ -343,6 +359,12 @@
             gap: 8px;
             font-size: 13px;
             white-space: nowrap;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .user-info:hover {
+            opacity: 1;
         }
         
         .user-avatar {
@@ -353,6 +375,47 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .user-info:hover .user-avatar {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 160px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .user-dropdown.show {
+            display: block;
+        }
+        
+        .user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        
+        .user-dropdown a:hover {
+            background: #f5f5f5;
+        }
+        
+        .user-dropdown a i {
+            width: 18px;
         }
         
         /* 移动端优化 */
@@ -380,10 +443,6 @@
             }
             
             .navbar-brand span {
-                display: none;
-            }
-            
-            .user-info span {
                 display: none;
             }
             
@@ -478,16 +537,27 @@
             <button class="hamburger-btn" id="hamburgerBtn">
                 <i class="bi bi-list"></i>
             </button>
-            <a href="index.php" class="navbar-brand">
+            <a href="<?= $baseAdminPath ?>index.php" class="navbar-brand">
                 <i class="bi bi-flower1"></i>
                 <span>二次元地址发布系统</span>
             </a>
         </div>
-        <div class="user-info">
+        <div class="user-info" id="userInfo" onclick="toggleUserDropdown()">
             <div class="user-avatar">
                 <i class="bi bi-person"></i>
             </div>
             <span><?= getCurrentAdmin()['username'] ?></span>
+            <i class="bi bi-chevron-down" style="font-size: 12px; opacity: 0.7;"></i>
+            <div class="user-dropdown" id="userDropdown">
+                <a href="<?= $baseAdminPath ?>profile.php">
+                    <i class="bi bi-person-circle"></i>
+                    <span>个人中心</span>
+                </a>
+                <a href="<?= $baseAdminPath ?>logout.php">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>退出登录</span>
+                </a>
+            </div>
         </div>
     </nav>
     
@@ -496,42 +566,47 @@
     
     <!-- 侧边栏 -->
     <aside class="sidebar" id="sidebar">
+        <?php $baseAdminPath = '/admin/'; ?>
         <div class="sidebar-menu">
-            <a href="index.php" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
+            <a href="<?= $baseAdminPath ?>index.php" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
                 <i class="bi bi-speedometer2"></i>
                 <span>管理首页</span>
             </a>
-            <a href="urls.php" class="<?= basename($_SERVER['PHP_SELF']) == 'urls.php' ? 'active' : '' ?>">
+            <a href="<?= $baseAdminPath ?>urls.php" class="<?= basename($_SERVER['PHP_SELF']) == 'urls.php' ? 'active' : '' ?>">
                 <i class="bi bi-link-45deg"></i>
                 <span>网址管理</span>
             </a>
-            <a href="ads.php" class="<?= basename($_SERVER['PHP_SELF']) == 'ads.php' ? 'active' : '' ?>">
+            <a href="<?= $baseAdminPath ?>ads.php" class="<?= basename($_SERVER['PHP_SELF']) == 'ads.php' ? 'active' : '' ?>">
                 <i class="bi bi-megaphone"></i>
                 <span>广告管理</span>
             </a>
-            <a href="announcements.php" class="<?= basename($_SERVER['PHP_SELF']) == 'announcements.php' ? 'active' : '' ?>">
+            <a href="<?= $baseAdminPath ?>announcements.php" class="<?= basename($_SERVER['PHP_SELF']) == 'announcements.php' ? 'active' : '' ?>">
                 <i class="bi bi-bell"></i>
                 <span>公告管理</span>
             </a>
-            <a href="style.php" class="<?= basename($_SERVER['PHP_SELF']) == 'style.php' ? 'active' : '' ?>">
+            <a href="<?= $baseAdminPath ?>style.php" class="<?= basename($_SERVER['PHP_SELF']) == 'style.php' ? 'active' : '' ?>">
                 <i class="bi bi-palette"></i>
                 <span>前端风格</span>
             </a>
             <div class="sidebar-divider"></div>
-            <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
+            <a href="<?= $baseAdminPath ?>settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
                 <i class="bi bi-gear"></i>
                 <span>系统设置</span>
             </a>
-            <a href="stats.php" class="<?= basename($_SERVER['PHP_SELF']) == 'stats.php' ? 'active' : '' ?>">
+            <a href="<?= $baseAdminPath ?>stats.php" class="<?= basename($_SERVER['PHP_SELF']) == 'stats.php' ? 'active' : '' ?>">
                 <i class="bi bi-graph-up"></i>
                 <span>访问统计</span>
+            </a>
+            <a href="<?= $baseAdminPath ?>profile.php" class="<?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">
+                <i class="bi bi-person-circle"></i>
+                <span>个人中心</span>
             </a>
             <div class="sidebar-divider"></div>
             <a href="../" target="_blank">
                 <i class="bi bi-box-arrow-up-right"></i>
                 <span>查看前台</span>
             </a>
-            <a href="logout.php" class="logout-btn">
+            <a href="<?= $baseAdminPath ?>logout.php" class="logout-btn">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>退出登录</span>
             </a>
@@ -585,6 +660,20 @@
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 992) {
                 closeSidebar();
+            }
+        });
+        
+        // 用户下拉菜单
+        function toggleUserDropdown() {
+            document.getElementById('userDropdown').classList.toggle('show');
+        }
+        
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            const userInfo = document.getElementById('userInfo');
+            const dropdown = document.getElementById('userDropdown');
+            if (!userInfo.contains(event.target)) {
+                dropdown.classList.remove('show');
             }
         });
     </script>
