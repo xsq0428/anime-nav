@@ -299,6 +299,166 @@ $announcements = $stmt->fetchAll();
             .container { padding: 20px 16px; }
             .url-grid { grid-template-columns: 1fr; }
         }
+
+        /* 公告弹窗样式 */
+        .announcement-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .announcement-modal.show {
+            display: flex;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .announcement-modal-content {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 198, 251, 0.3);
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .announcement-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #00c6fb, #005bea);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 198, 251, 0.3);
+        }
+
+        .announcement-modal-close:hover {
+            transform: rotate(90deg);
+            box-shadow: 0 4px 12px rgba(0, 198, 251, 0.5);
+        }
+
+        .announcement-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(0, 198, 251, 0.2);
+        }
+
+        .announcement-modal-icon {
+            font-size: 32px;
+        }
+
+        .announcement-modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #005bea;
+        }
+
+        .announcement-modal-body {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .announcement-modal-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 198, 251, 0.2);
+        }
+
+        .popup-nav-btn {
+            background: linear-gradient(135deg, #00c6fb, #005bea);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 198, 251, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .popup-nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 198, 251, 0.5);
+        }
+
+        .popup-nav-btn:active {
+            transform: translateY(0);
+        }
+
+        .popup-nav-btn.close-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .popup-nav-btn.close-btn:hover {
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.6);
+        }
+
+        .popup-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .popup-dots {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .popup-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(0, 198, 251, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .popup-dot.active {
+            background: linear-gradient(135deg, #00c6fb, #005bea);
+            transform: scale(1.3);
+            box-shadow: 0 2px 6px rgba(0, 198, 251, 0.5);
+        }
+
+        .popup-dot:hover {
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
@@ -318,6 +478,27 @@ $announcements = $stmt->fetchAll();
             <h1 class="main-title"><?= htmlspecialchars($settings['site_title'] ?? '') ?></h1>
             <p class="subtitle"><?= htmlspecialchars($settings['site_subtitle'] ?? '') ?></p>
         </header>
+
+        <!-- 公告弹窗 -->
+        <?php
+        $popupAnnouncements = array_filter($announcements, function($ann) {
+            return $ann['is_popup'] == 1;
+        });
+        $popupAnnouncements = array_values($popupAnnouncements);
+        if (!empty($popupAnnouncements)):
+        ?>
+        <div class="announcement-modal" id="announcementModal">
+            <div class="announcement-modal-content">
+                <button class="announcement-modal-close" onclick="closeAnnouncementModal()">×</button>
+                <div class="announcement-modal-header">
+                    <span class="announcement-modal-icon" id="modalIcon"></span>
+                    <span class="announcement-modal-title">重要通知</span>
+                </div>
+                <div class="announcement-modal-body" id="modalBody"></div>
+                <div class="announcement-modal-footer" id="modalFooter"></div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php if (!empty($announcements)): ?>
         <div class="glass-card">
@@ -413,6 +594,73 @@ $announcements = $stmt->fetchAll();
             fetch('api/click.php?id=' + urlId, { method: 'POST' });
             window.open(url, '_blank');
         }
+
+        // 弹窗公告数据
+        const popupAnnouncements = <?= json_encode(array_values($popupAnnouncements), JSON_UNESCAPED_UNICODE) ?>;
+        let currentPopupIndex = 0;
+
+        function showPopupAnnouncement(index) {
+            if (index >= popupAnnouncements.length || index < 0) return;
+            
+            const ann = popupAnnouncements[index];
+            document.getElementById('modalIcon').textContent = ann.icon;
+            document.getElementById('modalBody').innerHTML = ann.content.replace(/\n/g, '<br>');
+            
+            const isLast = index === popupAnnouncements.length - 1;
+            const isFirst = index === 0;
+            
+            // 更新底部按钮和指示器
+            const footer = document.getElementById('modalFooter');
+            let html = '<div class="popup-dots">';
+            for (let i = 0; i < popupAnnouncements.length; i++) {
+                html += '<span class="popup-dot' + (i === index ? ' active' : '') + '" onclick="jumpToPopup(' + i + ')"></span>';
+            }
+            html += '</div>';
+            
+            if (popupAnnouncements.length > 1) {
+                html += '<button class="popup-nav-btn' + (isFirst ? '" disabled' : '" onclick="prevPopup()') + '"><span>◀</span> 上一条</button>';
+                html += '<button class="popup-nav-btn' + (isLast ? '" disabled' : '" onclick="nextPopup()') + '"><span>▶</span> 下一条</button>';
+            } else {
+                html += '<button class="popup-nav-btn close-btn" onclick="closeAnnouncementModal()">关闭</button>';
+            }
+            
+            footer.innerHTML = html;
+        }
+
+        function prevPopup() {
+            if (currentPopupIndex > 0) {
+                currentPopupIndex--;
+                showPopupAnnouncement(currentPopupIndex);
+            }
+        }
+
+        function nextPopup() {
+            if (currentPopupIndex < popupAnnouncements.length - 1) {
+                currentPopupIndex++;
+                showPopupAnnouncement(currentPopupIndex);
+            }
+        }
+
+        function jumpToPopup(index) {
+            currentPopupIndex = index;
+            showPopupAnnouncement(currentPopupIndex);
+        }
+
+        function closeAnnouncementModal() {
+            document.getElementById('announcementModal').classList.remove('show');
+            sessionStorage.setItem('announcementClosed_' + window.location.hostname, 'true');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示弹窗
+            const modal = document.getElementById('announcementModal');
+            if (modal && popupAnnouncements.length > 0 && sessionStorage.getItem('announcementClosed_' + window.location.hostname) !== 'true') {
+                setTimeout(function() {
+                    showPopupAnnouncement(0);
+                    modal.classList.add('show');
+                }, 500);
+            }
+        });
     </script>
 </body>
 </html>

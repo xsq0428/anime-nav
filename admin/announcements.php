@@ -10,12 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         switch ($action) {
             case 'add':
-                $stmt = $pdo->prepare("INSERT INTO announcements (type, icon, content, is_active, sort_order) VALUES (?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO announcements (type, icon, content, is_active, is_popup, sort_order) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $_POST['type'],
                     $_POST['icon'] ?? '📌',
                     $_POST['content'],
                     isset($_POST['is_active']) ? 1 : 0,
+                    isset($_POST['is_popup']) ? 1 : 0,
                     (int)$_POST['sort_order']
                 ]);
                 setFlashMessage('success', '公告添加成功');
@@ -23,12 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
                 
             case 'edit':
-                $stmt = $pdo->prepare("UPDATE announcements SET type=?, icon=?, content=?, is_active=?, sort_order=? WHERE id=?");
+                $stmt = $pdo->prepare("UPDATE announcements SET type=?, icon=?, content=?, is_active=?, is_popup=?, sort_order=? WHERE id=?");
                 $stmt->execute([
                     $_POST['type'],
                     $_POST['icon'] ?? '📌',
                     $_POST['content'],
                     isset($_POST['is_active']) ? 1 : 0,
+                    isset($_POST['is_popup']) ? 1 : 0,
                     (int)$_POST['sort_order'],
                     (int)$_POST['id']
                 ]);
@@ -73,6 +75,7 @@ ob_start();
                         <th>图标</th>
                         <th>内容</th>
                         <th>状态</th>
+                        <th>弹窗</th>
                         <th width="150">操作</th>
                     </tr>
                 </thead>
@@ -92,6 +95,7 @@ ob_start();
                         <td><?= sanitize($row['icon']) ?></td>
                         <td><?= sanitize($row['content']) ?></td>
                         <td><span class="badge bg-<?= $row['is_active'] ? 'success' : 'secondary' ?>"><?= $row['is_active'] ? '启用' : '禁用' ?></span></td>
+                        <td><span class="badge bg-<?= $row['is_popup'] ? 'primary' : 'secondary' ?>"><?= $row['is_popup'] ? '弹窗' : '普通' ?></span></td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary edit-btn" 
                                 data-id="<?= $row['id'] ?>"
@@ -99,7 +103,8 @@ ob_start();
                                 data-icon="<?= htmlspecialchars($row['icon']) ?>"
                                 data-content="<?= htmlspecialchars($row['content'], ENT_QUOTES) ?>"
                                 data-sort="<?= $row['sort_order'] ?>"
-                                data-active="<?= $row['is_active'] ?>">
+                                data-active="<?= $row['is_active'] ?>"
+                                data-popup="<?= $row['is_popup'] ?>">
                                 <i class="bi bi-pencil"></i>
                             </button>
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement(<?= $row['id'] ?>)">
@@ -124,12 +129,13 @@ ob_start();
                         <h6 class="mb-0"><?= sanitize($row['icon']) ?> <?= sanitize($row['content']) ?></h6>
                         <span class="badge bg-<?= $row['is_active'] ? 'success' : 'secondary' ?>"><?= $row['is_active'] ? '启用' : '禁用' ?></span>
                     </div>
-                    <div class="mb-2">
+                        <div class="mb-2">
                         <small class="text-muted">类型:</small>
                         <?php
                         $types = ['bookmark' => '收藏提示', 'contact' => '联系信息', 'notice' => '公告'];
                         ?>
                         <span class="badge bg-info"><?= $types[$row['type']] ?? $row['type'] ?></span>
+                        <span class="badge bg-<?= $row['is_popup'] ? 'primary' : 'secondary' ?> ms-1"><?= $row['is_popup'] ? '弹窗' : '普通' ?></span>
                     </div>
                         <div class="d-flex justify-content-between align-items-center">
                         <small class="text-muted">排序：<?= $row['sort_order'] ?></small>
@@ -140,7 +146,8 @@ ob_start();
                                 data-icon="<?= htmlspecialchars($row['icon']) ?>"
                                 data-content="<?= htmlspecialchars($row['content'], ENT_QUOTES) ?>"
                                 data-sort="<?= $row['sort_order'] ?>"
-                                data-active="<?= $row['is_active'] ?>">
+                                data-active="<?= $row['is_active'] ?>"
+                                data-popup="<?= $row['is_popup'] ?>">
                                 <i class="bi bi-pencil"></i> 编辑
                             </button>
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement(<?= $row['id'] ?>)">
@@ -186,9 +193,13 @@ ob_start();
                         <label class="form-label">排序</label>
                         <input type="number" class="form-control" name="sort_order" id="announcementSort" value="0">
                     </div>
-                    <div class="form-check">
+                    <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" name="is_active" id="announcementActive" checked>
                         <label class="form-check-label">启用</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="is_popup" id="announcementPopup">
+                        <label class="form-check-label">弹窗显示（用户访问时自动弹出）</label>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -221,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('announcementContent').value = this.dataset.content;
             document.getElementById('announcementSort').value = this.dataset.sort;
             document.getElementById('announcementActive').checked = this.dataset.active == 1;
+            document.getElementById('announcementPopup').checked = this.dataset.popup == 1;
             announcementModal.show();
         });
     });
@@ -236,6 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('announcementContent').value = this.dataset.content;
             document.getElementById('announcementSort').value = this.dataset.sort;
             document.getElementById('announcementActive').checked = this.dataset.active == 1;
+            document.getElementById('announcementPopup').checked = this.dataset.popup == 1;
             announcementModal.show();
         });
     });
