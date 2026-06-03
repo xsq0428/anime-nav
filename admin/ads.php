@@ -3,7 +3,7 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 requireLogin();
 
-$action = $_GET['action'] ?? 'list';
+$action = $_GET['action'] ?? $_POST['action'] ?? 'list';
 $pdo = getDbConnection();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
